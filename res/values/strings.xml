@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">wallpaper01</string>
+    <string name="hello_world">hello_world</string>
+    <string name="menu_settings">menu_settings</string>
+    <string name="title_activity_main">title_activity_main</string>
+    <string name="description">ライブ壁紙</string>
+
+</resources>
