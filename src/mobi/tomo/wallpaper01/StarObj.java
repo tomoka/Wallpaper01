@@ -47,7 +47,7 @@ public class StarObj {
 		alphaNum = 255;
 		for(int i = 0;i<star.length;i++){
 			star[i] = new Star();
-			degree[i] = 30;
+			degree[i] = 30*i;
 		}
 
 		Log.i("tag", "☆☆☆☆☆☆☆☆☆☆draw_status------------>" + draw_status );
@@ -94,8 +94,10 @@ public class StarObj {
 	public void run(Canvas canvas,Bitmap itemTouch,float mTouchX,float mTouchY) {
 		update();
 		Log.i("tag", "☆draw_status------------>" + draw_status );
-		int starX = (int) mTouchX -50;
-		int starY = (int) mTouchY -50;
+		int starX = (int) mTouchX - itemTouch.getWidth()/2;
+		int starY = (int) mTouchY - itemTouch.getHeight()/2;
+		Log.i("drawStep", "☆☆☆starX-------->" + starX );
+		Log.i("drawStep", "☆☆☆xbitemTouch.getWidth()-------->" + itemTouch.getWidth() );
 
 		
 		//Step01　分裂☆をふやす
@@ -105,6 +107,8 @@ public class StarObj {
 					star[i].x = starX;
 					star[i].y = starY;
 					matrix3.setTranslate(star[i].x, star[i].y);
+					matrix3.preScale(1, 1);
+
 					canvas.drawBitmap(itemTouch, matrix3,paint);
 				}
 				drawStep02();
@@ -121,14 +125,15 @@ public class StarObj {
 			
 				for(int i = 0;i<star.length;i++){
 					int radius = (int) (5*ScaleSize);
-					int degree = 30*i;
-					star[i].x = (int) (starX + (Math.cos(degree)*(radius)));
-					star[i].y = (int) (starY + (Math.sin(degree)*(radius)));
+					star[i].x = (int) (starX + radius - (itemTouch.getWidth()*ScaleSize/40) + ((Math.cos(degree[i])*(radius))));
+					star[i].y = (int) (starY + radius - (itemTouch.getHeight()*ScaleSize/40) + ((Math.sin(degree[i])*(radius))));
 
-					//matrix3.setTranslate(star[i].x+((itemTouch.getWidth()*ScaleSize/4)/4), star[i].y+((itemTouch.getHeight()*ScaleSize/4)/4));
 					matrix3.setTranslate(star[i].x, star[i].y);
-					//matrix3.preScale(ScaleSize, ScaleSize);
+					matrix3.preScale(ScaleSize/20, ScaleSize/20);
 					Log.i("drawStep", "☆☆zahyou------------>" + star[i].x+"-------"+ star[i].y );
+					Log.i("drawStep", "☆☆itemTouch.getWidth()-------->" + itemTouch.getWidth() );
+					Log.i("drawStep", "☆☆ScaleSize-------->" + ScaleSize );
+					Log.i("drawStep", "☆☆itemTouch.getWidth()*ScaleSize/40-------->" + itemTouch.getWidth()*ScaleSize/40 );
 					Log.i("drawStep", "☆☆ScaleSize:alphaNum-------->" + ScaleSize +":"+ alphaNum );
 					
 					paint.setAlpha(alphaNum);
