@@ -109,7 +109,7 @@ public class StarObj {
 					star[i].x = starX;
 					star[i].y = starY;
 					matrix3.setTranslate(star[i].x, star[i].y);
-
+					paint.setAlpha(0);
 					canvas.drawBitmap(itemTouch, matrix3,paint);
 				}
 				drawStep02();
@@ -122,11 +122,10 @@ public class StarObj {
 			Log.i("drawStep", "☆☆ScaleSize------------>" + ScaleSize );
 			Log.i("drawStep", "☆☆passed_time------------>" + passed_time );
 			//スケールサイズを大きく
-			ScaleSize++;
+			ScaleSize = (float) (ScaleSize + 0.2);
 			
 				for(int i = 0;i<star.length;i++){
-					int radius = (int) (5*ScaleSize);
-					degree[i] = 30*i;
+					int radius = (int) (10*ScaleSize);
 					star[i].x = (int) ((starX) + (Math.cos(degree[i])*(radius+itemTouch.getWidth()*ScaleSize*2)));
 					star[i].y = (int) ((starY) + (Math.sin(degree[i])*(radius+itemTouch.getHeight()*ScaleSize*2)));
 					
@@ -149,7 +148,7 @@ public class StarObj {
 				}else{
 					drawStep02();
 					alphaNum = (int) (alphaNum - (alphaNum * 0.4));
-					ScaleSize = (int) (ScaleSize + (ScaleSize * 0.3333));
+					ScaleSize = (float) (ScaleSize + (ScaleSize * 0.1));
 				}
 		}
 	}
