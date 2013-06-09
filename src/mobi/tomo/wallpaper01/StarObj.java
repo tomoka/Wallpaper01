@@ -104,10 +104,11 @@ public class StarObj {
 		if (draw_status.equals(DrawStatus.drawStep01)) {
 				
 				for(int i = 0;i<star.length;i++){
+					//star[i].x = starX - itemTouch.getWidth()/2;
+					//star[i].y = starY - itemTouch.getHeight()/2;
 					star[i].x = starX;
 					star[i].y = starY;
 					matrix3.setTranslate(star[i].x, star[i].y);
-					matrix3.preScale(1, 1);
 
 					canvas.drawBitmap(itemTouch, matrix3,paint);
 				}
@@ -125,15 +126,19 @@ public class StarObj {
 			
 				for(int i = 0;i<star.length;i++){
 					int radius = (int) (5*ScaleSize);
-					star[i].x = (int) (starX + radius - (itemTouch.getWidth()*ScaleSize/40) + ((Math.cos(degree[i])*(radius))));
-					star[i].y = (int) (starY + radius - (itemTouch.getHeight()*ScaleSize/40) + ((Math.sin(degree[i])*(radius))));
+					degree[i] = 30*i;
+					star[i].x = (int) ((starX) + (Math.cos(degree[i])*(radius+itemTouch.getWidth()*ScaleSize*2)));
+					star[i].y = (int) ((starY) + (Math.sin(degree[i])*(radius+itemTouch.getHeight()*ScaleSize*2)));
+					
+					//star[i].x = (int) (200 + (Math.cos(degree[i])*(radius)));
+					//star[i].y = (int) (200 + (Math.sin(degree[i])*(radius)));
 
 					matrix3.setTranslate(star[i].x, star[i].y);
-					matrix3.preScale(ScaleSize/20, ScaleSize/20);
+					matrix3.preScale(ScaleSize, ScaleSize);
 					Log.i("drawStep", "☆☆zahyou------------>" + star[i].x+"-------"+ star[i].y );
 					Log.i("drawStep", "☆☆itemTouch.getWidth()-------->" + itemTouch.getWidth() );
 					Log.i("drawStep", "☆☆ScaleSize-------->" + ScaleSize );
-					Log.i("drawStep", "☆☆itemTouch.getWidth()*ScaleSize/40-------->" + itemTouch.getWidth()*ScaleSize/40 );
+					Log.i("drawStep", "☆☆itemTouch.getWidth()*ScaleSize/2-------->" + itemTouch.getWidth()*ScaleSize/2 );
 					Log.i("drawStep", "☆☆ScaleSize:alphaNum-------->" + ScaleSize +":"+ alphaNum );
 					
 					paint.setAlpha(alphaNum);
@@ -144,7 +149,7 @@ public class StarObj {
 				}else{
 					drawStep02();
 					alphaNum = (int) (alphaNum - (alphaNum * 0.4));
-					ScaleSize = (int) (ScaleSize + (ScaleSize * 0.9));
+					ScaleSize = (int) (ScaleSize + (ScaleSize * 0.3333));
 				}
 		}
 	}
