@@ -1,3 +1,4 @@
+/*開発用マスターブランチ*/
 package mobi.tomo.wallpaper01;
 
 import java.util.Calendar;
