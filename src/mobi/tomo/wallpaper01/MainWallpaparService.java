@@ -224,10 +224,10 @@ public class MainWallpaparService extends WallpaperService {
 				sakura[ii].run(canvas,snow);
 			}
 			
-			if(mTouchX >=0 && mTouchY >=0){
+			/*if(mTouchX >=0 && mTouchY >=0){
 				StarObj.run(canvas,itemTouch,mTouchX,mTouchY);
 
-			}
+			}*/
 		}
 
 	}
