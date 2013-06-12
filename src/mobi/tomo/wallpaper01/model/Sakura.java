@@ -39,12 +39,17 @@ public class Sakura {
 	int ran;
 	Random rnd = new Random();
 	long old_time = System.currentTimeMillis();
-			
+
 	public Sakura() {
 		//初期化
 		init();
 	}
 	
+	private WindowManager getWindowManager() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	//初期化処理中身
 	public void init(){
 		speed = rnd.nextInt(10) + 10;
@@ -52,15 +57,22 @@ public class Sakura {
 		height_y = rnd.nextInt(300) - 400;
 		degree = 0;
 		addDegree = rnd.nextInt(30) + 30;
-		defaultSpeed = rnd.nextInt(30) + 5;	
+		defaultSpeed = rnd.nextInt(30) + 5;
 	}
 	
-	public void run(Canvas canvas,Bitmap snow){
+	public void run(Canvas canvas,Bitmap snow,float newWidth,float newHeight){
 		long now_time = System.currentTimeMillis();
+		
+		/*
+		 * 縦方向下へ動く　Step01
+		 * 横方向右へ動く　Step02
+		 * 縦方向上へ動く　Step03
+		 * 横方向左へ動く　Step04 
+		 * */
 
-			if (height_y > 1000) {
-				init();
-				}
+		if (height_y > newHeight) {
+			init();
+			}
 			
 			//回転
 			degree = degree + addDegree;
@@ -93,17 +105,16 @@ public class Sakura {
 			 * 速さを保存して、次の処理で使う
 			 */
 			defaultSpeed = defaultSpeed + gravity*elapsedTime;
+			
+			int abs_speed = (int) Math.abs(speed);
 
-			matrix.setScale(speed/10,speed/10);
+			matrix.setScale(abs_speed/10,abs_speed/10);
 			snow_X = snow_X/2;
 			snow_X = snow_X+snow.getWidth()/-2+wide_x;
 			snow_Y = snow_Y/2;
 			snow_Y = snow_Y + snow.getHeight()/-2+height_y;
 			matrix.postRotate(degree,snow_X,snow_Y);
 			
-			//Log.d("tag", "snow.getWidth()------>"+ snow.getWidth());
-			//Log.d("tag", "snow.getHeight()------>"+ snow.getHeight());
-
 			if (snow_R != null) {
 				snow_R = null;
 			}

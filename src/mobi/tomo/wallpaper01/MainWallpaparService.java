@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+
 
 public class MainWallpaparService extends WallpaperService {
 
@@ -44,23 +46,21 @@ public class MainWallpaparService extends WallpaperService {
 	//クラス配列の表現
 	//クラスの生成は１カ所にまとめた方が良い
 	Sakura[] sakura = new Sakura[15];
-	//StarObj[] StarObj = new StarObj[1];
 	StarObj StarObj = new StarObj();
 	
+
 	@Override
 	public Engine onCreateEngine() {
 		return new LiveWallpaperEngine();
 	}
 
 	class LiveWallpaperEngine extends Engine {
-		//Bitmap bg0;
 		Bitmap snow;
 		Bitmap itemTouch;
 		float x;
 		Canvas canvas = null;
 		
 		LiveWallpaperEngine() {
-			//bg0 = BitmapFactory.decodeResource(getResources(), R.drawable.milkeyway);
 			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow);
 			itemTouch  = BitmapFactory.decodeResource(getResources(), R.drawable.star);
 
@@ -68,10 +68,6 @@ public class MainWallpaparService extends WallpaperService {
 				sakura[ii] = new Sakura();
 			}
 			
-			/*for(int ii = 0;ii<StarObj.length;ii++){
-				StarObj[ii] = new StarObj();
-			}*/
-
 		}
 
 		@Override
@@ -158,22 +154,20 @@ public class MainWallpaparService extends WallpaperService {
 
 
 		void drawFrame(float mTouchX,float mTouchY) {
-            final SurfaceHolder holder = getSurfaceHolder();            
+            final SurfaceHolder holder = getSurfaceHolder();
+            
 			// ウィンドウマネージャのインスタンス取得
-			//WindowManager wm = (WindowManager)getSystemService(WINDOW_SERVICE);
+			WindowManager wm = (WindowManager)getSystemService(WINDOW_SERVICE);
 			// ディスプレイのインスタンス生成
-			//Display disp = wm.getDefaultDisplay();
+			Display disp = wm.getDefaultDisplay();
 			
-			/*int width = bg0.getWidth();
-			int height = bg0.getHeight();
 			float newWidth = disp.getWidth();
 			float newHeight = disp.getHeight();
-			
-			float scale = newHeight / height;
-			float scaleWidth = scale;
-			float scaleHeight = scale;*/
 
-			canvas = holder.lockCanvas();
+    		Log.i("WindowSize", "newWidth=======" + newWidth );
+    		Log.i("WindowSize", "newHeight=======" + newHeight );
+
+    		canvas = holder.lockCanvas();
             try {
                 if (canvas != null) {
                 	red = red + redAdd;
@@ -205,7 +199,7 @@ public class MainWallpaparService extends WallpaperService {
             		Log.i("color", "blue=======" + blue );
 
                 	canvas.drawColor(Color.argb(alpha, red, green, blue));
-    				animate(canvas, mTouchX, mTouchY);
+    				animate(canvas, mTouchX, mTouchY,newWidth,newHeight);
                 }
             } finally {
                 if (canvas != null) holder.unlockCanvasAndPost(canvas);
@@ -213,21 +207,27 @@ public class MainWallpaparService extends WallpaperService {
 
 
 		}
-		private synchronized void animate(Canvas canvas,float mTouchX,float mTouchY) {
-			drawClock(canvas, mTouchX, mTouchY);
+		private synchronized void animate(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
+			drawClock(canvas, mTouchX, mTouchY,newWidth,newHeight);
 			mHandler.removeCallbacks(animationRunnable);
 			mHandler.postDelayed(animationRunnable,25);
 		};
 
-		private void drawClock(Canvas canvas,float mTouchX,float mTouchY) {
+		private void drawClock(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
+
 			for(int ii = 0;ii<sakura.length;ii++){
-				sakura[ii].run(canvas,snow);
+				sakura[ii].run(canvas,snow,newWidth,newHeight);
 			}
 			
 			if(mTouchX >=0 && mTouchY >=0){
-				StarObj.run(canvas,itemTouch,mTouchX,mTouchY);
+				//StarObj.run(canvas,itemTouch,mTouchX,mTouchY);
 
 			}
+		}
+
+		private WindowManager getWindowManager() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
