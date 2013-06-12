@@ -1,4 +1,4 @@
-/*開発用マスターブランチ*/
+/*カベ跳ね返り用20130612*/
 package mobi.tomo.wallpaper01;
 
 import java.util.Calendar;
