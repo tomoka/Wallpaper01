@@ -60,29 +60,19 @@ public class Sakura {
 		defaultSpeed = rnd.nextInt(30) + 5;
 	}
 	
-	public void run(Canvas canvas,Bitmap snow,float newWidth,float newHeight){
+	public void run(Canvas canvas,Bitmap snow,float newWidth,float newHeight,float sensorX,float sensorY,float sensorZ){
 		long now_time = System.currentTimeMillis();
 		
-		/*
-		 * 縦方向下へ動く　Step01
-		 * 横方向右へ動く　Step02
-		 * 縦方向上へ動く　Step03
-		 * 横方向左へ動く　Step04 
-		 * */
-
-		if (height_y > newHeight) {
-			init();
-			}
-			
 			//回転
 			degree = degree + addDegree;
+			
 			if (degree >= 360){
 				degree = 0;
 				}
 						
 			/* d[i]度の場合のラジアン */
 			rad = (float) (Math.PI/180 * degree);
-			
+		
 			x1 = wide_x;
 			y1 = snow_Y;
 			
@@ -93,6 +83,25 @@ public class Sakura {
 			snow_X = x2;
 			snow_Y = y2;
 
+			/*
+			 * 縦方向下へ動く　Step01
+			 * 横方向右へ動く　Step02
+			 * 縦方向上へ動く　Step03
+			 * 横方向左へ動く　Step04 
+			 * 
+
+			if (height_y > newHeight || height_y < 0 ) {
+				//init();
+				speed = speed*-1;
+				}
+			if (wide_x > newWidth || wide_x < 0 ) {
+				//init();
+				speed = speed*-1;
+				}*/
+				
+			if (height_y > newHeight ) {
+				init();
+				}
 			Matrix matrix = new Matrix();
 						
 			/* distance 
@@ -106,16 +115,20 @@ public class Sakura {
 			 */
 			defaultSpeed = defaultSpeed + gravity*elapsedTime;
 			
-			int abs_speed = (int) Math.abs(speed);
+			//float abs_speed = (float) Math.abs(speed);
 
-			matrix.setScale(abs_speed/10,abs_speed/10);
+			//matrix.setScale(abs_speed/10,abs_speed/10);
+			matrix.setScale(speed/10,speed/10);
 			snow_X = snow_X/2;
 			snow_X = snow_X+snow.getWidth()/-2+wide_x;
 			snow_Y = snow_Y/2;
 			snow_Y = snow_Y + snow.getHeight()/-2+height_y;
 			matrix.postRotate(degree,snow_X,snow_Y);
 			
-			if (snow_R != null) {
+    		Log.i("snow", "snow_X=======" + snow_X );
+    		Log.i("snow", "snow_Y=======" + snow_Y );
+
+    		if (snow_R != null) {
 				snow_R = null;
 			}
 			snow_R = Bitmap.createBitmap(snow,0,0,snow.getWidth(),snow.getHeight(),matrix,false);
@@ -123,7 +136,8 @@ public class Sakura {
 						
 			Matrix matrix2 = new Matrix();
 			
-			matrix2.setTranslate(snow_R.getWidth()/-2+wide_x,snow_R.getHeight()/-2+height_y);
+			//matrix2.setTranslate(snow_R.getWidth()/-2+wide_x,snow_R.getHeight()/-2+height_y);
+			matrix2.setTranslate(wide_x-snow_R.getWidth()/-2,height_y-snow_R.getHeight()/-2);
 
 			canvas.drawBitmap(snow_R , matrix2, new Paint());
 			long pass_time = now_time - old_time;

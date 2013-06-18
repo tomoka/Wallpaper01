@@ -1,4 +1,4 @@
-/*カベ跳ね返り用20130612*/
+/*重力センサー基礎20130612*/
 package mobi.tomo.wallpaper01;
 
 import java.util.Calendar;
@@ -6,13 +6,21 @@ import java.util.Random;
 
 import mobi.tomo.wallpaper01.model.Sakura;
 
+import android.app.Activity;
+import android.content.Context;
+import android.hardware.SensorManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -22,9 +30,10 @@ import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
 
-public class MainWallpaparService extends WallpaperService {
+public class MainWallpaparService extends WallpaperService{
 
 	private final Handler mHandler = new Handler();
+	
 	String nyash_count = null;
 
 	int count = 200;	
@@ -46,21 +55,37 @@ public class MainWallpaparService extends WallpaperService {
 	//クラス配列の表現
 	//クラスの生成は１カ所にまとめた方が良い
 	Sakura[] sakura = new Sakura[15];
-	StarObj StarObj = new StarObj();
+	StarObj StarObj = new StarObj();	
+
+	private SensorManager mSensorManager;
+	// センサーを指定する
+	int SENSOR_NAME = Sensor.TYPE_ACCELEROMETER;
+	// センサーの値を取得するタイミングを指定する
+	int SENSOR_DELAY = SensorManager.SENSOR_DELAY_NORMAL;
+	//センサー格納
+	float sensorX = (float) 1.00;
+	float sensorY = (float) 1.00;
+	float sensorZ = (float) 1.00;
 	
+	/** 加速度センサーオブジェクト */
+	private Sensor mAccelerometerSensor;
 
 	@Override
 	public Engine onCreateEngine() {
+		Log.d("step", "onCreateEngine");		
 		return new LiveWallpaperEngine();
 	}
 
-	class LiveWallpaperEngine extends Engine {
+	class LiveWallpaperEngine extends Engine implements SensorEventListener {
+		
 		Bitmap snow;
 		Bitmap itemTouch;
 		float x;
 		Canvas canvas = null;
 		
 		LiveWallpaperEngine() {
+			Log.d("step", "LiveWallpaperEngine");
+
 			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow);
 			itemTouch  = BitmapFactory.decodeResource(getResources(), R.drawable.star);
 
@@ -69,14 +94,26 @@ public class MainWallpaparService extends WallpaperService {
 			}
 			
 		}
+		
+		/*
+		 * @Overrideしない。
+		 * デフォルトでBundle savedInstanceStateが引数に入ってくる
+		 * 
+		 */
 
-		@Override
 		public void onCreate(SurfaceHolder surfaceHolder) {
 			super.onCreate(surfaceHolder);
-			
+
+			Log.d("step", "onCreate(SurfaceHolder surfaceHolder)");
+			// SensorManagerインスタンスを取得
+			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+			// マネージャから加速度センサーオブジェクトを取得
+			mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
 			//タッチイベント取得
 			setTouchEventsEnabled(true);
 		}
+
 		private final Runnable animationRunnable = new Runnable() {
             public void run() {
 				drawFrame(mTouchX, mTouchY);
@@ -149,11 +186,23 @@ public class MainWallpaparService extends WallpaperService {
 
 		public void onSurfaceCreated(SurfaceHolder holder) {
 			super.onSurfaceCreated(holder);
+			Log.d("step", "onSurfaceCreated(SurfaceHolder holder)");
+			Log.i("mSensorManager", " mSensorManager=" + mSensorManager );
+			
+			mSensorManager.registerListener((SensorEventListener) this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
 		}
 		
+		//public void onSurfaceChenge(SurfaceHolder holder){ 画面がきり変わるライフサイクルがある }
+		
+		public void onSurfaceDestroyed(SurfaceHolder holder){
+			super.onSurfaceDestroyed(holder);
+			Log.d("step", "onSurfaceDestroyed(SurfaceHolder holder)");
+			mSensorManager.unregisterListener((SensorListener) this);
+		}
 
 
 		void drawFrame(float mTouchX,float mTouchY) {
+
             final SurfaceHolder holder = getSurfaceHolder();
             
 			// ウィンドウマネージャのインスタンス取得
@@ -216,19 +265,37 @@ public class MainWallpaparService extends WallpaperService {
 		private void drawClock(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
 
 			for(int ii = 0;ii<sakura.length;ii++){
-				sakura[ii].run(canvas,snow,newWidth,newHeight);
+				sakura[ii].run(canvas,snow,newWidth,newHeight,sensorX,sensorY,sensorZ);
 			}
 			
 			if(mTouchX >=0 && mTouchY >=0){
-				//StarObj.run(canvas,itemTouch,mTouchX,mTouchY);
+				StarObj.run(canvas,itemTouch,mTouchX,mTouchY);
 
 			}
 		}
+		
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-		private WindowManager getWindowManager() {
-			// TODO Auto-generated method stub
-			return null;
+			// 精度が変更された時に呼ばれる
 		}
+
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+
+			// センサータイプが取得したいものか否かを確認
+			if (event.sensor.getType() == SENSOR_NAME) {
+				// 表示フォーマットの指定の開始
+				// X軸Y軸Z軸それぞれの加速度を取得
+				//Log.d("onSensorChanged", " x: " + String.valueOf(event.values[0]) + "\ty: " + String.valueOf(event.values[1]) + "\tz: " + String.valueOf(event.values[2])); // 表示フォーマットの指定の終了
+				sensorX = event.values[0];
+				sensorY = event.values[1];
+				sensorZ = event.values[2];
+				Log.d("onSensorChanged", " x: " + sensorX); // 表示フォーマットの指定の終了
+			}
+
+	}
 
 	}
 }
+
