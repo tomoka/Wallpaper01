@@ -1,4 +1,4 @@
-/*重力センサー基礎20130612*/
+/*重力センサー活用20130618*/
 package mobi.tomo.wallpaper01;
 
 import java.util.Calendar;
