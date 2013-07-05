@@ -1,3 +1,4 @@
+/*５月制作CLASS*/
 package mobi.tomo.wallpaper01.model;
 
 import java.util.Random;
@@ -26,6 +27,8 @@ public class Sakura {
 	float y1;
 	float x2;
 	float y2;
+	float x3=0;
+	float y3=0;
 	float dx;
 	float dy;
 	
@@ -55,6 +58,7 @@ public class Sakura {
 		speed = rnd.nextInt(10) + 10;
 		wide_x = rnd.nextInt(680);
 		height_y = rnd.nextInt(300) - 400;
+		//height_y = 400;
 		degree = 0;
 		addDegree = rnd.nextInt(30) + 30;
 		defaultSpeed = rnd.nextInt(30) + 5;
@@ -97,11 +101,20 @@ public class Sakura {
 			if (wide_x > newWidth || wide_x < 0 ) {
 				//init();
 				speed = speed*-1;
-				}*/
+				}
 				
+			if (wide_x > newWidth ) {
+				init();
+				}*/
 			if (height_y > newHeight ) {
 				init();
 				}
+			/*if (wide_x < 0 ) {
+				init();
+				}
+			if (height_y < 0 ) {
+				init();
+				}*/
 			Matrix matrix = new Matrix();
 						
 			/* distance 
@@ -136,9 +149,13 @@ public class Sakura {
 						
 			Matrix matrix2 = new Matrix();
 			
-			//matrix2.setTranslate(snow_R.getWidth()/-2+wide_x,snow_R.getHeight()/-2+height_y);
-			matrix2.setTranslate(wide_x-snow_R.getWidth()/-2,height_y-snow_R.getHeight()/-2);
-
+			/*x3=snow_R.getWidth()/-2+wide_x;
+			y3=snow_R.getHeight()/-2+height_y;
+			
+			wide_x = x3;
+			height_y = y3;*/
+			matrix2.setTranslate(snow_R.getWidth()/-2+wide_x,snow_R.getHeight()/-2+height_y);
+			
 			canvas.drawBitmap(snow_R , matrix2, new Paint());
 			long pass_time = now_time - old_time;
 

@@ -1,10 +1,12 @@
-/*重力センサー活用20130618*/
+/*重力センサー活用20130618
+ * 加速度XとYに適応*/
 package mobi.tomo.wallpaper01;
 
 import java.util.Calendar;
 import java.util.Random;
 
 import mobi.tomo.wallpaper01.model.Sakura;
+import mobi.tomo.wallpaper01.model.SakuraGravity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -54,7 +56,7 @@ public class MainWallpaparService extends WallpaperService{
 	
 	//クラス配列の表現
 	//クラスの生成は１カ所にまとめた方が良い
-	Sakura[] sakura = new Sakura[15];
+	SakuraGravity[] sakura = new SakuraGravity[15];
 	StarObj StarObj = new StarObj();	
 
 	private SensorManager mSensorManager;
@@ -72,7 +74,7 @@ public class MainWallpaparService extends WallpaperService{
 
 	@Override
 	public Engine onCreateEngine() {
-		Log.d("step", "onCreateEngine");		
+		//Log.d("step", "onCreateEngine");		
 		return new LiveWallpaperEngine();
 	}
 
@@ -84,13 +86,13 @@ public class MainWallpaparService extends WallpaperService{
 		Canvas canvas = null;
 		
 		LiveWallpaperEngine() {
-			Log.d("step", "LiveWallpaperEngine");
+			//Log.d("step", "LiveWallpaperEngine");
 
 			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow);
 			itemTouch  = BitmapFactory.decodeResource(getResources(), R.drawable.star);
 
 			for(int ii = 0;ii<sakura.length;ii++){
-				sakura[ii] = new Sakura();
+				sakura[ii] = new SakuraGravity();
 			}
 			
 		}
@@ -104,7 +106,7 @@ public class MainWallpaparService extends WallpaperService{
 		public void onCreate(SurfaceHolder surfaceHolder) {
 			super.onCreate(surfaceHolder);
 
-			Log.d("step", "onCreate(SurfaceHolder surfaceHolder)");
+			//Log.d("step", "onCreate(SurfaceHolder surfaceHolder)");
 			// SensorManagerインスタンスを取得
 			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 			// マネージャから加速度センサーオブジェクトを取得
@@ -143,7 +145,7 @@ public class MainWallpaparService extends WallpaperService{
 		//タッチイベント呼び出し
         public void onTouchEvent(MotionEvent event) {
 			super.onTouchEvent(event);
-			Log.d("tag", "onTouchEvent:"+ event.getAction());
+			//Log.d("tag", "onTouchEvent:"+ event.getAction());
 			//タッチイベント呼び出し
 			//タッチアクションの情報を取得
 			int action = event.getAction();
@@ -154,7 +156,7 @@ public class MainWallpaparService extends WallpaperService{
 			//イベントごとにログを出力
 			switch(action & MotionEvent.ACTION_MASK) {
 				case MotionEvent.ACTION_DOWN:
-					Log.i("tag", "Touch Down" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch Down" + " count=" + count + ", id=" + id);
 					
 					mTouchX = event.getX();
 					mTouchY = event.getY();
@@ -164,16 +166,16 @@ public class MainWallpaparService extends WallpaperService{
 
 					break;
 				case MotionEvent.ACTION_POINTER_DOWN:
-					Log.i("tag", "Touch PTR Down" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch PTR Down" + " count=" + count + ", id=" + id);
 					break;
 				case MotionEvent.ACTION_UP:
-					Log.i("tag", "Touch Up" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch Up" + " count=" + count + ", id=" + id);
 					break;
 				case MotionEvent.ACTION_POINTER_UP:
-					Log.i("tag", "Touch PTR Up" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch PTR Up" + " count=" + count + ", id=" + id);
 					break;
 				case MotionEvent.ACTION_MOVE:
-					Log.i("tag", "Touch Move" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch Move" + " count=" + count + ", id=" + id);
 					break;
 				}
 			
@@ -213,8 +215,8 @@ public class MainWallpaparService extends WallpaperService{
 			float newWidth = disp.getWidth();
 			float newHeight = disp.getHeight();
 
-    		Log.i("WindowSize", "newWidth=======" + newWidth );
-    		Log.i("WindowSize", "newHeight=======" + newHeight );
+    		//Log.i("WindowSize", "newWidth=======" + newWidth );
+    		//Log.i("WindowSize", "newHeight=======" + newHeight );
 
     		canvas = holder.lockCanvas();
             try {
@@ -243,9 +245,9 @@ public class MainWallpaparService extends WallpaperService{
                 		blueAdd = 1 * (rnd.nextInt(5) + 1);
                 		blue = 0;
                 	}
-            		Log.i("color", "red=======" + red );
-            		Log.i("color", "green=======" + green );
-            		Log.i("color", "blue=======" + blue );
+            		//Log.i("color", "red=======" + red );
+            		//Log.i("color", "green=======" + green );
+            		//Log.i("color", "blue=======" + blue );
 
                 	canvas.drawColor(Color.argb(alpha, red, green, blue));
     				animate(canvas, mTouchX, mTouchY,newWidth,newHeight);
@@ -291,7 +293,31 @@ public class MainWallpaparService extends WallpaperService{
 				sensorX = event.values[0];
 				sensorY = event.values[1];
 				sensorZ = event.values[2];
+				/*if(sensorX > 0){
+					sensorX = sensorX + 7;
+				}
+				if(sensorY > 0){
+					sensorY = sensorY + 7;
+				}
+				if(sensorX > 0){
+					sensorX = sensorX + 7;
+				}
+				if(sensorX < 0){
+					sensorX = sensorX - 7;
+				}
+				if(sensorY < 0){
+					sensorY = sensorY - 7;
+				}
+				if(sensorX < 0){
+					sensorX = sensorX - 7;
+				}
+				sensorX = (float) Math.floor(sensorX);
+				sensorY = (float) Math.floor(sensorY);
+				sensorZ = (float) Math.floor(sensorZ);*/
+
 				Log.d("onSensorChanged", " x: " + sensorX); // 表示フォーマットの指定の終了
+				Log.d("onSensorChanged", " y: " + sensorY); // 表示フォーマットの指定の終了
+				Log.d("onSensorChanged", " z: " + sensorZ); // 表示フォーマットの指定の終了
 			}
 
 	}
