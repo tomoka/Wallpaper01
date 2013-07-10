@@ -1,3 +1,4 @@
+/*５月制作CLASS*/
 package mobi.tomo.wallpaper01.model;
 
 import java.util.Random;
@@ -26,6 +27,8 @@ public class Sakura {
 	float y1;
 	float x2;
 	float y2;
+	float x3=0;
+	float y3=0;
 	float dx;
 	float dy;
 	
@@ -39,38 +42,41 @@ public class Sakura {
 	int ran;
 	Random rnd = new Random();
 	long old_time = System.currentTimeMillis();
-			
+
 	public Sakura() {
 		//初期化
 		init();
 	}
 	
+	private WindowManager getWindowManager() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	//初期化処理中身
 	public void init(){
 		speed = rnd.nextInt(10) + 10;
 		wide_x = rnd.nextInt(680);
 		height_y = rnd.nextInt(300) - 400;
+		//height_y = 400;
 		degree = 0;
 		addDegree = rnd.nextInt(30) + 30;
-		defaultSpeed = rnd.nextInt(30) + 5;	
+		defaultSpeed = rnd.nextInt(30) + 5;
 	}
 	
-	public void run(Canvas canvas,Bitmap snow){
+	public void run(Canvas canvas,Bitmap snow,float newWidth,float newHeight,float sensorX,float sensorY,float sensorZ){
 		long now_time = System.currentTimeMillis();
-
-			if (height_y > 1000) {
-				init();
-				}
-			
+		
 			//回転
 			degree = degree + addDegree;
+			
 			if (degree >= 360){
 				degree = 0;
 				}
 						
 			/* d[i]度の場合のラジアン */
 			rad = (float) (Math.PI/180 * degree);
-			
+		
 			x1 = wide_x;
 			y1 = snow_Y;
 			
@@ -81,6 +87,34 @@ public class Sakura {
 			snow_X = x2;
 			snow_Y = y2;
 
+			/*
+			 * 縦方向下へ動く　Step01
+			 * 横方向右へ動く　Step02
+			 * 縦方向上へ動く　Step03
+			 * 横方向左へ動く　Step04 
+			 * 
+
+			if (height_y > newHeight || height_y < 0 ) {
+				//init();
+				speed = speed*-1;
+				}
+			if (wide_x > newWidth || wide_x < 0 ) {
+				//init();
+				speed = speed*-1;
+				}
+				
+			if (wide_x > newWidth ) {
+				init();
+				}*/
+			if (height_y > newHeight ) {
+				init();
+				}
+			/*if (wide_x < 0 ) {
+				init();
+				}
+			if (height_y < 0 ) {
+				init();
+				}*/
 			Matrix matrix = new Matrix();
 						
 			/* distance 
@@ -93,7 +127,10 @@ public class Sakura {
 			 * 速さを保存して、次の処理で使う
 			 */
 			defaultSpeed = defaultSpeed + gravity*elapsedTime;
+			
+			//float abs_speed = (float) Math.abs(speed);
 
+			//matrix.setScale(abs_speed/10,abs_speed/10);
 			matrix.setScale(speed/10,speed/10);
 			snow_X = snow_X/2;
 			snow_X = snow_X+snow.getWidth()/-2+wide_x;
@@ -101,10 +138,10 @@ public class Sakura {
 			snow_Y = snow_Y + snow.getHeight()/-2+height_y;
 			matrix.postRotate(degree,snow_X,snow_Y);
 			
-			//Log.d("tag", "snow.getWidth()------>"+ snow.getWidth());
-			//Log.d("tag", "snow.getHeight()------>"+ snow.getHeight());
+    		Log.i("snow", "snow_X=======" + snow_X );
+    		Log.i("snow", "snow_Y=======" + snow_Y );
 
-			if (snow_R != null) {
+    		if (snow_R != null) {
 				snow_R = null;
 			}
 			snow_R = Bitmap.createBitmap(snow,0,0,snow.getWidth(),snow.getHeight(),matrix,false);
@@ -112,8 +149,13 @@ public class Sakura {
 						
 			Matrix matrix2 = new Matrix();
 			
+			/*x3=snow_R.getWidth()/-2+wide_x;
+			y3=snow_R.getHeight()/-2+height_y;
+			
+			wide_x = x3;
+			height_y = y3;*/
 			matrix2.setTranslate(snow_R.getWidth()/-2+wide_x,snow_R.getHeight()/-2+height_y);
-
+			
 			canvas.drawBitmap(snow_R , matrix2, new Paint());
 			long pass_time = now_time - old_time;
 

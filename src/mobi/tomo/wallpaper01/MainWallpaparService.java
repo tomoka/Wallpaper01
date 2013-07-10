@@ -1,17 +1,28 @@
 /*開発用マスターブランチ*/
+
 package mobi.tomo.wallpaper01;
 
 import java.util.Calendar;
 import java.util.Random;
 
 import mobi.tomo.wallpaper01.model.Sakura;
+import mobi.tomo.wallpaper01.model.SakuraGravity;
 
+import android.app.Activity;
+import android.content.Context;
+import android.hardware.SensorManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -20,9 +31,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
-public class MainWallpaparService extends WallpaperService {
+
+public class MainWallpaparService extends WallpaperService{
 
 	private final Handler mHandler = new Handler();
+	
 	String nyash_count = null;
 
 	int count = 200;	
@@ -43,44 +56,66 @@ public class MainWallpaparService extends WallpaperService {
 	
 	//クラス配列の表現
 	//クラスの生成は１カ所にまとめた方が良い
-	Sakura[] sakura = new Sakura[15];
-	//StarObj[] StarObj = new StarObj[1];
-	StarObj StarObj = new StarObj();
+	SakuraGravity[] sakura = new SakuraGravity[15];
+	StarObj StarObj = new StarObj();	
+
+	private SensorManager mSensorManager;
+	// センサーを指定する
+	int SENSOR_NAME = Sensor.TYPE_ACCELEROMETER;
+	// センサーの値を取得するタイミングを指定する
+	int SENSOR_DELAY = SensorManager.SENSOR_DELAY_NORMAL;
+	//センサー格納
+	float sensorX = (float) 1.00;
+	float sensorY = (float) 1.00;
+	float sensorZ = (float) 1.00;
 	
+	/** 加速度センサーオブジェクト */
+	private Sensor mAccelerometerSensor;
+
 	@Override
 	public Engine onCreateEngine() {
+		//Log.d("step", "onCreateEngine");		
 		return new LiveWallpaperEngine();
 	}
 
-	class LiveWallpaperEngine extends Engine {
-		//Bitmap bg0;
+	class LiveWallpaperEngine extends Engine implements SensorEventListener {
+		
 		Bitmap snow;
 		Bitmap itemTouch;
 		float x;
 		Canvas canvas = null;
 		
 		LiveWallpaperEngine() {
-			//bg0 = BitmapFactory.decodeResource(getResources(), R.drawable.milkeyway);
+			//Log.d("step", "LiveWallpaperEngine");
+
 			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow);
 			itemTouch  = BitmapFactory.decodeResource(getResources(), R.drawable.star);
 
 			for(int ii = 0;ii<sakura.length;ii++){
-				sakura[ii] = new Sakura();
+				sakura[ii] = new SakuraGravity();
 			}
 			
-			/*for(int ii = 0;ii<StarObj.length;ii++){
-				StarObj[ii] = new StarObj();
-			}*/
-
 		}
+		
+		/*
+		 * @Overrideしない。
+		 * デフォルトでBundle savedInstanceStateが引数に入ってくる
+		 * 
+		 */
 
-		@Override
 		public void onCreate(SurfaceHolder surfaceHolder) {
 			super.onCreate(surfaceHolder);
-			
+
+			//Log.d("step", "onCreate(SurfaceHolder surfaceHolder)");
+			// SensorManagerインスタンスを取得
+			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+			// マネージャから加速度センサーオブジェクトを取得
+			mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
 			//タッチイベント取得
 			setTouchEventsEnabled(true);
 		}
+
 		private final Runnable animationRunnable = new Runnable() {
             public void run() {
 				drawFrame(mTouchX, mTouchY);
@@ -110,7 +145,7 @@ public class MainWallpaparService extends WallpaperService {
 		//タッチイベント呼び出し
         public void onTouchEvent(MotionEvent event) {
 			super.onTouchEvent(event);
-			Log.d("tag", "onTouchEvent:"+ event.getAction());
+			//Log.d("tag", "onTouchEvent:"+ event.getAction());
 			//タッチイベント呼び出し
 			//タッチアクションの情報を取得
 			int action = event.getAction();
@@ -121,7 +156,7 @@ public class MainWallpaparService extends WallpaperService {
 			//イベントごとにログを出力
 			switch(action & MotionEvent.ACTION_MASK) {
 				case MotionEvent.ACTION_DOWN:
-					Log.i("tag", "Touch Down" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch Down" + " count=" + count + ", id=" + id);
 					
 					mTouchX = event.getX();
 					mTouchY = event.getY();
@@ -131,16 +166,16 @@ public class MainWallpaparService extends WallpaperService {
 
 					break;
 				case MotionEvent.ACTION_POINTER_DOWN:
-					Log.i("tag", "Touch PTR Down" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch PTR Down" + " count=" + count + ", id=" + id);
 					break;
 				case MotionEvent.ACTION_UP:
-					Log.i("tag", "Touch Up" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch Up" + " count=" + count + ", id=" + id);
 					break;
 				case MotionEvent.ACTION_POINTER_UP:
-					Log.i("tag", "Touch PTR Up" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch PTR Up" + " count=" + count + ", id=" + id);
 					break;
 				case MotionEvent.ACTION_MOVE:
-					Log.i("tag", "Touch Move" + " count=" + count + ", id=" + id);
+					//Log.i("tag", "Touch Move" + " count=" + count + ", id=" + id);
 					break;
 				}
 			
@@ -153,27 +188,37 @@ public class MainWallpaparService extends WallpaperService {
 
 		public void onSurfaceCreated(SurfaceHolder holder) {
 			super.onSurfaceCreated(holder);
+			Log.d("step", "onSurfaceCreated(SurfaceHolder holder)");
+			Log.i("mSensorManager", " mSensorManager=" + mSensorManager );
+			
+			mSensorManager.registerListener((SensorEventListener) this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
 		}
 		
+		//public void onSurfaceChenge(SurfaceHolder holder){ 画面がきり変わるライフサイクルがある }
+		
+		public void onSurfaceDestroyed(SurfaceHolder holder){
+			super.onSurfaceDestroyed(holder);
+			Log.d("step", "onSurfaceDestroyed(SurfaceHolder holder)");
+			mSensorManager.unregisterListener((SensorListener) this);
+		}
 
 
 		void drawFrame(float mTouchX,float mTouchY) {
-            final SurfaceHolder holder = getSurfaceHolder();            
+
+            final SurfaceHolder holder = getSurfaceHolder();
+            
 			// ウィンドウマネージャのインスタンス取得
-			//WindowManager wm = (WindowManager)getSystemService(WINDOW_SERVICE);
+			WindowManager wm = (WindowManager)getSystemService(WINDOW_SERVICE);
 			// ディスプレイのインスタンス生成
-			//Display disp = wm.getDefaultDisplay();
+			Display disp = wm.getDefaultDisplay();
 			
-			/*int width = bg0.getWidth();
-			int height = bg0.getHeight();
 			float newWidth = disp.getWidth();
 			float newHeight = disp.getHeight();
-			
-			float scale = newHeight / height;
-			float scaleWidth = scale;
-			float scaleHeight = scale;*/
 
-			canvas = holder.lockCanvas();
+    		//Log.i("WindowSize", "newWidth=======" + newWidth );
+    		//Log.i("WindowSize", "newHeight=======" + newHeight );
+
+    		canvas = holder.lockCanvas();
             try {
                 if (canvas != null) {
                 	red = red + redAdd;
@@ -200,12 +245,12 @@ public class MainWallpaparService extends WallpaperService {
                 		blueAdd = 1 * (rnd.nextInt(5) + 1);
                 		blue = 0;
                 	}
-            		Log.i("color", "red=======" + red );
-            		Log.i("color", "green=======" + green );
-            		Log.i("color", "blue=======" + blue );
+            		//Log.i("color", "red=======" + red );
+            		//Log.i("color", "green=======" + green );
+            		//Log.i("color", "blue=======" + blue );
 
                 	canvas.drawColor(Color.argb(alpha, red, green, blue));
-    				animate(canvas, mTouchX, mTouchY);
+    				animate(canvas, mTouchX, mTouchY,newWidth,newHeight);
                 }
             } finally {
                 if (canvas != null) holder.unlockCanvasAndPost(canvas);
@@ -213,15 +258,16 @@ public class MainWallpaparService extends WallpaperService {
 
 
 		}
-		private synchronized void animate(Canvas canvas,float mTouchX,float mTouchY) {
-			drawClock(canvas, mTouchX, mTouchY);
+		private synchronized void animate(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
+			drawClock(canvas, mTouchX, mTouchY,newWidth,newHeight);
 			mHandler.removeCallbacks(animationRunnable);
 			mHandler.postDelayed(animationRunnable,25);
 		};
 
-		private void drawClock(Canvas canvas,float mTouchX,float mTouchY) {
+		private void drawClock(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
+
 			for(int ii = 0;ii<sakura.length;ii++){
-				sakura[ii].run(canvas,snow);
+				sakura[ii].run(canvas,snow,newWidth,newHeight,sensorX,sensorY,sensorZ);
 			}
 			
 			/*if(mTouchX >=0 && mTouchY >=0){
@@ -229,6 +275,53 @@ public class MainWallpaparService extends WallpaperService {
 
 			}*/
 		}
+		
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+			// 精度が変更された時に呼ばれる
+		}
+
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+
+			// センサータイプが取得したいものか否かを確認
+			if (event.sensor.getType() == SENSOR_NAME) {
+				// 表示フォーマットの指定の開始
+				// X軸Y軸Z軸それぞれの加速度を取得
+				//Log.d("onSensorChanged", " x: " + String.valueOf(event.values[0]) + "\ty: " + String.valueOf(event.values[1]) + "\tz: " + String.valueOf(event.values[2])); // 表示フォーマットの指定の終了
+				sensorX = event.values[0];
+				sensorY = event.values[1];
+				sensorZ = event.values[2];
+				/*if(sensorX > 0){
+					sensorX = sensorX + 7;
+				}
+				if(sensorY > 0){
+					sensorY = sensorY + 7;
+				}
+				if(sensorX > 0){
+					sensorX = sensorX + 7;
+				}
+				if(sensorX < 0){
+					sensorX = sensorX - 7;
+				}
+				if(sensorY < 0){
+					sensorY = sensorY - 7;
+				}
+				if(sensorX < 0){
+					sensorX = sensorX - 7;
+				}
+				sensorX = (float) Math.floor(sensorX);
+				sensorY = (float) Math.floor(sensorY);
+				sensorZ = (float) Math.floor(sensorZ);*/
+
+				Log.d("onSensorChanged", " x: " + sensorX); // 表示フォーマットの指定の終了
+				Log.d("onSensorChanged", " y: " + sensorY); // 表示フォーマットの指定の終了
+				Log.d("onSensorChanged", " z: " + sensorZ); // 表示フォーマットの指定の終了
+			}
+
+	}
 
 	}
 }
+
