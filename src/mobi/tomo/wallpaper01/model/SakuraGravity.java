@@ -80,25 +80,25 @@ public class SakuraGravity {
 		nowHeight = newHeight;
 
 			
-			if (wide_x > nowWidth ) {
-				defaultSpeedY = 1;
-				defaultSpeedX = 1;
-				wide_x = -10;
-				}
-			if (height_y > nowHeight ) {
+			if (wide_x > nowWidth-35 ) {
 				defaultSpeedY = 0;
 				defaultSpeedX = 0;
-				height_y = -10;
+				wide_x = nowWidth-35;
 				}
-			if (wide_x < -11 ) {
+			if (height_y > nowHeight-35 ) {
 				defaultSpeedY = 0;
 				defaultSpeedX = 0;
-				wide_x = nowWidth;
+				height_y = nowHeight-35;
 				}
-			if (height_y < -11 ) {
-				defaultSpeedY = 1;
-				defaultSpeedX = 1;
-				height_y = nowHeight;
+			if (wide_x < 0 ) {
+				defaultSpeedY = 0;
+				defaultSpeedX = 0;
+				wide_x = 0;
+				}
+			if (height_y < 0 ) {
+				defaultSpeedY = 0;
+				defaultSpeedX = 0;
+				height_y = 0;
 				}
 			Matrix matrix = new Matrix();
 			Matrix matrix2 = new Matrix();
@@ -112,16 +112,26 @@ public class SakuraGravity {
 			defaultSpeedY = defaultSpeedY + gravityY*elapsedTime;
 			defaultSpeedX = defaultSpeedX + gravityX*elapsedTime;
 			
-			//float abs_scale = (float) Math.abs(sensorZ/3)+1;
-			float abs_scale = sensorZ;
+			//float abs_scale = (float) Math.round(sensorZ/2);
+			float abs_scale = (float) sensorZ/4;
+				/*if(abs_scale < 0){
+					  abs_scale = (float) Math.abs(abs_scale);
+				}else{
+					  abs_scale = 1;
+				}*/
+			abs_scale = (float) Math.abs(abs_scale);
+			if(abs_scale < 1){
+				  abs_scale = (float) (1);
+			}
+			//float abs_scale = sensorZ;
 			
 			/*nowWidth = newWidth*(1/abs_scale);
 			nowHeight = newHeight*(1/abs_scale);
 			nowWide_x = wide_x*(1/abs_scale);
 			nowHeight_y = height_y*(1/abs_scale);*/
 			
-			//matrix.setScale(abs_scale,abs_scale);
-			matrix.setTranslate(wide_x,height_y);
+			matrix.setScale(abs_scale,abs_scale);
+			matrix.postTranslate(wide_x,height_y);
 			//matrix2.setTranslate(wide_x,height_y);
 			
     		Log.i("snow", "height_y=======" + height_y );

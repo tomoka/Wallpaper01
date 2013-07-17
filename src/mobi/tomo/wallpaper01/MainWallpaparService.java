@@ -1,11 +1,12 @@
-/*開発用マスターブランチ*/
+/*20130717星がはじける＋ボールが画面から消えないブランチ*/
 
 package mobi.tomo.wallpaper01;
 
 import java.util.Calendar;
 import java.util.Random;
 
-import mobi.tomo.wallpaper01.model.Sakura;
+import mobi.tomo.wallpaper01.StarObj;
+//import mobi.tomo.wallpaper01.model.Sakura;
 import mobi.tomo.wallpaper01.model.SakuraGravity;
 
 import android.app.Activity;
@@ -56,8 +57,8 @@ public class MainWallpaparService extends WallpaperService{
 	
 	//クラス配列の表現
 	//クラスの生成は１カ所にまとめた方が良い
-	SakuraGravity[] sakura = new SakuraGravity[15];
-	StarObj StarObj = new StarObj();	
+	SakuraGravity sakura = new SakuraGravity();
+	StarObj starObj = new StarObj();	
 
 	private SensorManager mSensorManager;
 	// センサーを指定する
@@ -90,10 +91,7 @@ public class MainWallpaparService extends WallpaperService{
 
 			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow);
 			itemTouch  = BitmapFactory.decodeResource(getResources(), R.drawable.star);
-
-			for(int ii = 0;ii<sakura.length;ii++){
-				sakura[ii] = new SakuraGravity();
-			}
+			starObj.init();
 			
 		}
 		
@@ -133,8 +131,7 @@ public class MainWallpaparService extends WallpaperService{
 
 		
 		@Override
-		public void onOffsetsChanged(float xOffset, float yOffset, float xStep,
-				float yStep, int xPixels, int yPixels) {
+		public void onOffsetsChanged(float xOffset, float yOffset, float xStep,float yStep, int xPixels, int yPixels) {
 
 				float xPixelsF = (float)xPixels;
 	        	x = (float) (xPixelsF*2.33);
@@ -156,12 +153,12 @@ public class MainWallpaparService extends WallpaperService{
 			//イベントごとにログを出力
 			switch(action & MotionEvent.ACTION_MASK) {
 				case MotionEvent.ACTION_DOWN:
-					//Log.i("tag", "Touch Down" + " count=" + count + ", id=" + id);
+					Log.i("tag", "Touch Down" + " count=" + count + ", id=" + id);
 					
 					mTouchX = event.getX();
 					mTouchY = event.getY();
 
-					StarObj.start();
+					starObj.start();
 					super.onTouchEvent(event);
 
 					break;
@@ -265,15 +262,8 @@ public class MainWallpaparService extends WallpaperService{
 		};
 
 		private void drawClock(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
-
-			for(int ii = 0;ii<sakura.length;ii++){
-				sakura[ii].run(canvas,snow,newWidth,newHeight,sensorX,sensorY,sensorZ);
-			}
-			
-			/*if(mTouchX >=0 && mTouchY >=0){
-				StarObj.run(canvas,itemTouch,mTouchX,mTouchY);
-
-			}*/
+			sakura.run(canvas,snow,newWidth,newHeight,sensorX,sensorY,sensorZ);
+			starObj.run(canvas,itemTouch,mTouchX, mTouchY);
 		}
 		
 		@Override
@@ -293,27 +283,6 @@ public class MainWallpaparService extends WallpaperService{
 				sensorX = event.values[0];
 				sensorY = event.values[1];
 				sensorZ = event.values[2];
-				/*if(sensorX > 0){
-					sensorX = sensorX + 7;
-				}
-				if(sensorY > 0){
-					sensorY = sensorY + 7;
-				}
-				if(sensorX > 0){
-					sensorX = sensorX + 7;
-				}
-				if(sensorX < 0){
-					sensorX = sensorX - 7;
-				}
-				if(sensorY < 0){
-					sensorY = sensorY - 7;
-				}
-				if(sensorX < 0){
-					sensorX = sensorX - 7;
-				}
-				sensorX = (float) Math.floor(sensorX);
-				sensorY = (float) Math.floor(sensorY);
-				sensorZ = (float) Math.floor(sensorZ);*/
 
 				Log.d("onSensorChanged", " x: " + sensorX); // 表示フォーマットの指定の終了
 				Log.d("onSensorChanged", " y: " + sensorY); // 表示フォーマットの指定の終了

@@ -2,7 +2,6 @@ package mobi.tomo.wallpaper01;
 
 import java.lang.reflect.Array;
 
-import mobi.tomo.wallpaper01.model.Sakura;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -43,14 +42,15 @@ public class StarObj {
 	
 	public void start() {
 		draw_status = DrawStatus.start;
-		ScaleSize = 0;
+		ScaleSize = 1;
 		alphaNum = 255;
 		for(int i = 0;i<star.length;i++){
 			star[i] = new Star();
 			degree[i] = 30*i;
 		}
-
 		Log.i("tag", "☆☆☆☆☆☆☆☆☆☆draw_status------------>" + draw_status );
+		Log.i("tag", "☆☆☆☆☆☆☆☆☆☆old_time------------>" + old_time );
+		update();
 	}
 	
 	public void end() {
@@ -59,9 +59,11 @@ public class StarObj {
 	
 	public void drawStep01() {
 		draw_status = DrawStatus.drawStep01;
+		Log.i("tag", "☆☆☆draw_status------------>" + draw_status );
 	}
 	public void drawStep02() {
 		draw_status = DrawStatus.drawStep02;
+		Log.i("tag", "☆☆☆★draw_status------------>" + draw_status );
 	}
 	
 	public void update() {
