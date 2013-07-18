@@ -119,29 +119,18 @@ public class StarObj {
 		}
 		//Step02　拡大してひろがる
 		if (draw_status.equals(DrawStatus.drawStep02)) {
-			Log.i("drawStep", "☆☆drawStep------------>" + draw_status );
-			Log.i("drawStep", "☆☆alphaNum------------>" + alphaNum );
-			Log.i("drawStep", "☆☆ScaleSize------------>" + ScaleSize );
-			Log.i("drawStep", "☆☆passed_time------------>" + passed_time );
+
 			//スケールサイズを大きく
-			ScaleSize = (float) (ScaleSize + 0.2);
+			ScaleSize = (float) (ScaleSize + 0.1);
 			
 				for(int i = 0;i<star.length;i++){
 					int radius = (int) (10*ScaleSize);
 					star[i].x = (int) ((starX) + (Math.cos(degree[i])*(radius+itemTouch.getWidth()*ScaleSize*2)));
 					star[i].y = (int) ((starY) + (Math.sin(degree[i])*(radius+itemTouch.getHeight()*ScaleSize*2)));
 					
-					//star[i].x = (int) (200 + (Math.cos(degree[i])*(radius)));
-					//star[i].y = (int) (200 + (Math.sin(degree[i])*(radius)));
-
 					matrix3.setTranslate(star[i].x, star[i].y);
 					matrix3.preScale(ScaleSize, ScaleSize);
-					Log.i("drawStep", "☆☆zahyou------------>" + star[i].x+"-------"+ star[i].y );
-					Log.i("drawStep", "☆☆itemTouch.getWidth()-------->" + itemTouch.getWidth() );
-					Log.i("drawStep", "☆☆ScaleSize-------->" + ScaleSize );
-					Log.i("drawStep", "☆☆itemTouch.getWidth()*ScaleSize/2-------->" + itemTouch.getWidth()*ScaleSize/2 );
-					Log.i("drawStep", "☆☆ScaleSize:alphaNum-------->" + ScaleSize +":"+ alphaNum );
-					
+					//透明度セット
 					paint.setAlpha(alphaNum);
 					canvas.drawBitmap(itemTouch, matrix3,paint);
 				}

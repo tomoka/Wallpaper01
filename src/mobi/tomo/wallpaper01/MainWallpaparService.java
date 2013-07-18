@@ -1,4 +1,7 @@
-/*20130717星がはじける＋ボールが画面から消えないブランチ*/
+/*開発用マスターブランチ
+ * 20130717 背景描画色クラス分け
+ * 20130718 衝突判定 球を二つ出してぶつかったら跳ね返る
+ * */
 
 package mobi.tomo.wallpaper01;
 
@@ -6,7 +9,6 @@ import java.util.Calendar;
 import java.util.Random;
 
 import mobi.tomo.wallpaper01.StarObj;
-//import mobi.tomo.wallpaper01.model.Sakura;
 import mobi.tomo.wallpaper01.model.SakuraGravity;
 
 import android.app.Activity;
@@ -44,21 +46,10 @@ public class MainWallpaparService extends WallpaperService{
 	float mTouchX = -100;
 	float mTouchY = -100;
 	
-	Random rnd = new Random();
-
-	int red = rnd.nextInt(255);
-	int green = rnd.nextInt(255);
-	int blue = rnd.nextInt(255);
-	int redAdd = 1;
-	int greenAdd = 1;
-	int blueAdd = 1;
-	//0~255 100がマックスではありません。
-	int alpha = 255;
-	
 	//クラス配列の表現
-	//クラスの生成は１カ所にまとめた方が良い
-	SakuraGravity sakura = new SakuraGravity();
+	SakuraGravity sakura[] = new SakuraGravity[2];
 	StarObj starObj = new StarObj();	
+	BackgroundColorChange backgroundColorChange = new BackgroundColorChange();	
 
 	private SensorManager mSensorManager;
 	// センサーを指定する
@@ -75,7 +66,6 @@ public class MainWallpaparService extends WallpaperService{
 
 	@Override
 	public Engine onCreateEngine() {
-		//Log.d("step", "onCreateEngine");		
 		return new LiveWallpaperEngine();
 	}
 
@@ -87,11 +77,14 @@ public class MainWallpaparService extends WallpaperService{
 		Canvas canvas = null;
 		
 		LiveWallpaperEngine() {
-			//Log.d("step", "LiveWallpaperEngine");
-
 			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow);
 			itemTouch  = BitmapFactory.decodeResource(getResources(), R.drawable.star);
 			starObj.init();
+			for(int ii = 0;ii<sakura.length;ii++){
+				//SakuraGravityクラスの複製
+				sakura[ii] = new SakuraGravity();
+				sakura[ii].init();
+			}
 			
 		}
 		
@@ -104,7 +97,6 @@ public class MainWallpaparService extends WallpaperService{
 		public void onCreate(SurfaceHolder surfaceHolder) {
 			super.onCreate(surfaceHolder);
 
-			//Log.d("step", "onCreate(SurfaceHolder surfaceHolder)");
 			// SensorManagerインスタンスを取得
 			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 			// マネージャから加速度センサーオブジェクトを取得
@@ -142,7 +134,6 @@ public class MainWallpaparService extends WallpaperService{
 		//タッチイベント呼び出し
         public void onTouchEvent(MotionEvent event) {
 			super.onTouchEvent(event);
-			//Log.d("tag", "onTouchEvent:"+ event.getAction());
 			//タッチイベント呼び出し
 			//タッチアクションの情報を取得
 			int action = event.getAction();
@@ -212,46 +203,18 @@ public class MainWallpaparService extends WallpaperService{
 			float newWidth = disp.getWidth();
 			float newHeight = disp.getHeight();
 
-    		//Log.i("WindowSize", "newWidth=======" + newWidth );
-    		//Log.i("WindowSize", "newHeight=======" + newHeight );
-
     		canvas = holder.lockCanvas();
-            try {
-                if (canvas != null) {
-                	red = red + redAdd;
-                	green = green + greenAdd;
-                	blue = blue + blueAdd;
-                	if(red > 255){
-                		redAdd = -1 * (rnd.nextInt(5) + 1);
-                		red = 255;
-               	}else if(red < 0){
-            		redAdd = 1 * (rnd.nextInt(5) + 1);
-                		red = 0;
-                	}
-                	if(green > 255){
-                		greenAdd = -1 * (rnd.nextInt(5) + 1);
-                		green = 255;
-               	}else if(green < 0){
-            		greenAdd = 1 * (rnd.nextInt(5) + 1);
-                		green = 0;
-                	}
-                	if(blue > 255){
-                		blueAdd = -1 * (rnd.nextInt(5) + 1);
-                		blue = 255;
-                	}else if(blue < 0){
-                		blueAdd = 1 * (rnd.nextInt(5) + 1);
-                		blue = 0;
-                	}
-            		//Log.i("color", "red=======" + red );
-            		//Log.i("color", "green=======" + green );
-            		//Log.i("color", "blue=======" + blue );
+    		backgroundColorChange.drawColorBackground();
 
-                	canvas.drawColor(Color.argb(alpha, red, green, blue));
+            try {
+        	    if (canvas != null) {
+        	    	canvas.drawColor(Color.argb(backgroundColorChange.alpha, backgroundColorChange.red, backgroundColorChange.green, backgroundColorChange.blue));
     				animate(canvas, mTouchX, mTouchY,newWidth,newHeight);
                 }
             } finally {
                 if (canvas != null) holder.unlockCanvasAndPost(canvas);
             }
+            
 
 
 		}
@@ -262,7 +225,12 @@ public class MainWallpaparService extends WallpaperService{
 		};
 
 		private void drawClock(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
-			sakura.run(canvas,snow,newWidth,newHeight,sensorX,sensorY,sensorZ);
+			for(int iii = 0;iii<sakura.length;iii++){
+				//SakuraGravityクラスの複製
+				sakura[iii].run(canvas,snow, newWidth,newHeight,sensorX,sensorY,sensorZ);
+				Log.d("sakura", " sakura[" + iii +"].x: " + sakura[iii].height_y);
+			}
+
 			starObj.run(canvas,itemTouch,mTouchX, mTouchY);
 		}
 		
@@ -284,9 +252,9 @@ public class MainWallpaparService extends WallpaperService{
 				sensorY = event.values[1];
 				sensorZ = event.values[2];
 
-				Log.d("onSensorChanged", " x: " + sensorX); // 表示フォーマットの指定の終了
-				Log.d("onSensorChanged", " y: " + sensorY); // 表示フォーマットの指定の終了
-				Log.d("onSensorChanged", " z: " + sensorZ); // 表示フォーマットの指定の終了
+				//Log.d("onSensorChanged", " x: " + sensorX); // 表示フォーマットの指定の終了
+				//Log.d("onSensorChanged", " y: " + sensorY); // 表示フォーマットの指定の終了
+				//Log.d("onSensorChanged", " z: " + sensorZ); // 表示フォーマットの指定の終了
 			}
 
 	}

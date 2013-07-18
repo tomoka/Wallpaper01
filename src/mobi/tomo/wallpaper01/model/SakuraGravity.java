@@ -123,12 +123,8 @@ public class SakuraGravity {
 			if(abs_scale < 1){
 				  abs_scale = (float) (1);
 			}
-			//float abs_scale = sensorZ;
-			
-			/*nowWidth = newWidth*(1/abs_scale);
-			nowHeight = newHeight*(1/abs_scale);
-			nowWide_x = wide_x*(1/abs_scale);
-			nowHeight_y = height_y*(1/abs_scale);*/
+
+			abs_scale = (float) (1);
 			
 			matrix.setScale(abs_scale,abs_scale);
 			matrix.postTranslate(wide_x,height_y);
