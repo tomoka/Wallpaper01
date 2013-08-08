@@ -95,19 +95,19 @@ public class SakuraGravity {
 				defaultSpeedX = 0;
 				wide_x = 0;
 				}
-			if (height_y < 0 ) {
+			if (height_y < 35 ) {
 				defaultSpeedY = 0;
 				defaultSpeedX = 0;
-				height_y = 0;
+				height_y = 35;
 				}
-			Matrix matrix = new Matrix();
-			Matrix matrix2 = new Matrix();
-					
-			gravityY = sensorY;
-			gravityX = sensorX*-1;
+
+			gravityY = sensorY*2;
+			gravityX = sensorX*-1*2;
 			
-			height_y = height_y + defaultSpeedY*elapsedTime + gravityY*elapsedTime*elapsedTime/2;
-			wide_x = wide_x + defaultSpeedX*elapsedTime + gravityX*elapsedTime*elapsedTime/2;
+			//height_y = height_y + defaultSpeedY*elapsedTime + gravityY*elapsedTime*elapsedTime/2;
+			//wide_x = wide_x + defaultSpeedX*elapsedTime + gravityX*elapsedTime*elapsedTime/2;
+			height_y = height_y + defaultSpeedY*elapsedTime + gravityY*elapsedTime*elapsedTime;
+			wide_x = wide_x + defaultSpeedX*elapsedTime + gravityX*elapsedTime*elapsedTime;
 
 			defaultSpeedY = defaultSpeedY + gravityY*elapsedTime;
 			defaultSpeedX = defaultSpeedX + gravityX*elapsedTime;
@@ -125,23 +125,28 @@ public class SakuraGravity {
 			}
 
 			abs_scale = (float) (1);
-			
-			matrix.setScale(abs_scale,abs_scale);
-			matrix.postTranslate(wide_x,height_y);
-			//matrix2.setTranslate(wide_x,height_y);
-			
+						
     		Log.i("snow", "height_y=======" + height_y );
     		Log.i("snow", "wide_x=======" + wide_x );
     		Log.i("snow", "abs_scale=======" + abs_scale );
     		Log.i("snow", "nowWidth=======" + nowWidth );
     		Log.i("snow", "nowHeight=======" + nowHeight );
-			
-			canvas.drawBitmap(snow , matrix, new Paint());
-			//canvas.drawBitmap(snow , matrix2, new Paint());
-			
+						
 			long pass_time = now_time - old_time;
 
 			old_time = now_time;
 	}
+	public void drowSakura(Canvas canvas,Bitmap snow, float wide_x2, float height_y2) {
+		// TODO Auto-generated method stub
+		
+		Matrix matrix = new Matrix();
+				
+		//matrix.setScale(abs_scale,abs_scale);
+		//matrix.postTranslate(wide_x,height_y);
+		matrix.setTranslate(wide_x,height_y);
+		canvas.drawBitmap(snow , matrix, new Paint());
+		//canvas.drawBitmap(snow , matrix2, new Paint());
+	}
+
 }
 

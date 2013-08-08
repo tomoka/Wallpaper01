@@ -1,6 +1,6 @@
 /*開発用マスターブランチ
  * 20130717 背景描画色クラス分け
- * 20130718 衝突判定 球を二つ出してぶつかったら跳ね返る
+ * 20130808 衝突判定 球を二つ出して重ならない
  * */
 
 package mobi.tomo.wallpaper01;
@@ -34,7 +34,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
-
 public class MainWallpaparService extends WallpaperService{
 
 	private final Handler mHandler = new Handler();
@@ -48,7 +47,8 @@ public class MainWallpaparService extends WallpaperService{
 	
 	//クラス配列の表現
 	SakuraGravity sakura[] = new SakuraGravity[2];
-	StarObj starObj = new StarObj();	
+	StarObj starObj = new StarObj();
+	HitTest hitTest = new HitTest();
 	BackgroundColorChange backgroundColorChange = new BackgroundColorChange();	
 
 	private SensorManager mSensorManager;
@@ -225,13 +225,35 @@ public class MainWallpaparService extends WallpaperService{
 		};
 
 		private void drawClock(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
-			for(int iii = 0;iii<sakura.length;iii++){
-				//SakuraGravityクラスの複製
-				sakura[iii].run(canvas,snow, newWidth,newHeight,sensorX,sensorY,sensorZ);
-				Log.d("sakura", " sakura[" + iii +"].x: " + sakura[iii].height_y);
+						
+			float sakuraHeight_y = sakura[0].height_y - sakura[1].height_y;
+			float sakuraWide_x = sakura[0].wide_x - sakura[1].wide_x;
+			
+			sakuraWide_x = Math.abs(sakuraWide_x);
+			sakuraHeight_y = Math.abs(sakuraHeight_y);
+
+			//桜の画角が30*30の場合
+			//重なっているときのみ座標の更新
+			if(sakuraHeight_y < 30 && sakuraWide_x < 30){
+				sakura[0].height_y = sakura[0].height_y - sakuraHeight_y/2 - 1;
+				sakura[0].wide_x = sakura[0].wide_x - sakuraWide_x/2 - 1;
+				
+				sakura[1].height_y = sakura[1].height_y + sakuraHeight_y/2 + 1;
+				sakura[1].wide_x = sakura[1].wide_x + sakuraWide_x/2 + 1;
+			}else{
+				for(int iii = 0;iii<sakura.length;iii++){
+					//SakuraGravityクラスの複製：座標更新
+					sakura[iii].run(canvas,snow, newWidth,newHeight,sensorX,sensorY,sensorZ);
+				}
+			}
+			
+			starObj.run(canvas,itemTouch,mTouchX,mTouchY);
+
+			for(int iiii = 0;iiii<sakura.length;iiii++){
+				//SakuraGravityクラスの複製:描画
+				sakura[iiii].drowSakura(canvas,snow,sakura[iiii].wide_x,sakura[iiii].height_y);
 			}
 
-			starObj.run(canvas,itemTouch,mTouchX, mTouchY);
 		}
 		
 		@Override
