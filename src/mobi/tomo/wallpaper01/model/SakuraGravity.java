@@ -10,7 +10,7 @@ import android.graphics.Paint;
 import android.util.Log;
 import android.view.WindowManager;
 
-public class SakuraGravity {
+public class SakuraGravity{
 	public float wide_x;
 	public float speed;
 	public float height_y;
