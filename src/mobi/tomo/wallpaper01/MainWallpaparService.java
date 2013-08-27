@@ -1,7 +1,13 @@
 /*開発用マスターブランチ
  * 20130717 背景描画色クラス分け
+<<<<<<< HEAD
  * 20130718 衝突判定 球を二つ出してぶつかったら跳ね返る
  * 20130808とマージして完了
+=======
+ * 20130808 衝突判定 球を二つ出して重ならない
+ * 20130827 衝突判定2 球を二つ出して重ならない
+>>>>>>> star20130808
+ * 20130827 カベに当たる 跳ね返る
  * */
 
 package mobi.tomo.wallpaper01;
@@ -35,7 +41,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
-
 public class MainWallpaparService extends WallpaperService{
 
 	private final Handler mHandler = new Handler();
@@ -49,7 +54,8 @@ public class MainWallpaparService extends WallpaperService{
 	
 	//クラス配列の表現
 	SakuraGravity sakura[] = new SakuraGravity[2];
-	StarObj starObj = new StarObj();	
+	StarObj starObj = new StarObj();
+	HitTest hitTest = new HitTest();
 	BackgroundColorChange backgroundColorChange = new BackgroundColorChange();	
 
 	private SensorManager mSensorManager;
@@ -72,15 +78,20 @@ public class MainWallpaparService extends WallpaperService{
 
 	class LiveWallpaperEngine extends Engine implements SensorEventListener {
 		
+		//Bitmap snow[] = new Bitmap[1];
 		Bitmap snow;
 		Bitmap itemTouch;
 		float x;
 		Canvas canvas = null;
 		
 		LiveWallpaperEngine() {
-			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow);
 			itemTouch  = BitmapFactory.decodeResource(getResources(), R.drawable.star);
+			//snow[0] = BitmapFactory.decodeResource(getResources() , R.drawable.snow1);
+			//snow[1] = BitmapFactory.decodeResource(getResources() , R.drawable.snow2);
+			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow2);
+			 			
 			starObj.init();
+			
 			for(int ii = 0;ii<sakura.length;ii++){
 				//SakuraGravityクラスの複製
 				sakura[ii] = new SakuraGravity();
@@ -125,7 +136,6 @@ public class MainWallpaparService extends WallpaperService{
 		
 		@Override
 		public void onOffsetsChanged(float xOffset, float yOffset, float xStep,float yStep, int xPixels, int yPixels) {
-
 				float xPixelsF = (float)xPixels;
 	        	x = (float) (xPixelsF*2.33);
 				drawFrame(mTouchX, mTouchY);
@@ -182,9 +192,7 @@ public class MainWallpaparService extends WallpaperService{
 			
 			mSensorManager.registerListener((SensorEventListener) this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
 		}
-		
-		//public void onSurfaceChenge(SurfaceHolder holder){ 画面がきり変わるライフサイクルがある }
-		
+				
 		public void onSurfaceDestroyed(SurfaceHolder holder){
 			super.onSurfaceDestroyed(holder);
 			Log.d("step", "onSurfaceDestroyed(SurfaceHolder holder)");
@@ -226,13 +234,18 @@ public class MainWallpaparService extends WallpaperService{
 		};
 
 		private void drawClock(Canvas canvas,float mTouchX,float mTouchY,float newWidth,float newHeight) {
-			for(int iii = 0;iii<sakura.length;iii++){
-				//SakuraGravityクラスの複製
-				sakura[iii].run(canvas,snow, newWidth,newHeight,sensorX,sensorY,sensorZ);
-				Log.d("sakura", " sakura[" + iii +"].x: " + sakura[iii].height_y);
+									
+			for(int mun = 0;mun<sakura.length;mun++){
+				//座標の更新
+				sakura[mun].run(canvas,snow, newWidth,newHeight,sensorX,sensorY,sensorZ);
 			}
-
-			starObj.run(canvas,itemTouch,mTouchX, mTouchY);
+			
+			starObj.run(canvas,itemTouch,mTouchX,mTouchY);
+			
+			for(int mun = 0;mun<sakura.length;mun++){
+				//SakuraGravityクラスの複製:描画
+				sakura[mun].drowSakura(canvas,snow,sakura[mun].wide_x,sakura[mun].height_y);
+			}
 		}
 		
 		@Override
@@ -252,10 +265,6 @@ public class MainWallpaparService extends WallpaperService{
 				sensorX = event.values[0];
 				sensorY = event.values[1];
 				sensorZ = event.values[2];
-
-				//Log.d("onSensorChanged", " x: " + sensorX); // 表示フォーマットの指定の終了
-				//Log.d("onSensorChanged", " y: " + sensorY); // 表示フォーマットの指定の終了
-				//Log.d("onSensorChanged", " z: " + sensorZ); // 表示フォーマットの指定の終了
 			}
 
 	}

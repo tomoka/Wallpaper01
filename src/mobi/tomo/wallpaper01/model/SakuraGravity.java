@@ -12,13 +12,13 @@ import android.view.WindowManager;
 
 public class SakuraGravity{
 	public float wide_x;
-	public float speed;
 	public float height_y;
+	public float speed;
 	public float degree;
 	public float addDegree;
 	public float defaultSpeed;
-	public float defaultSpeedY;
-	public float defaultSpeedX;
+	public double defaultSpeedY;
+	public double defaultSpeedX;
 	
 	//角度
 	float rad;
@@ -78,70 +78,78 @@ public class SakuraGravity{
 		long now_time = System.currentTimeMillis();
 		nowWidth = newWidth;
 		nowHeight = newHeight;
-
 			
 			if (wide_x > nowWidth-35 ) {
-				defaultSpeedY = 0;
-				defaultSpeedX = 0;
+				//defaultSpeedY = defaultSpeedY*2;
+				defaultSpeedX = defaultSpeedX*-1.2;
 				wide_x = nowWidth-35;
 				}
 			if (height_y > nowHeight-35 ) {
-				defaultSpeedY = 0;
-				defaultSpeedX = 0;
+				defaultSpeedY = defaultSpeedY*-1.2;
+				//defaultSpeedX = defaultSpeedX*2;
 				height_y = nowHeight-35;
 				}
 			if (wide_x < 0 ) {
-				defaultSpeedY = 0;
-				defaultSpeedX = 0;
+				//defaultSpeedY = defaultSpeedY*2;
+				defaultSpeedX = defaultSpeedX*1.5;
 				wide_x = 0;
 				}
-			if (height_y < 0 ) {
-				defaultSpeedY = 0;
-				defaultSpeedX = 0;
-				height_y = 0;
+			if (height_y < 35 ) {
+				defaultSpeedY = defaultSpeedY*1.5;
+				//defaultSpeedX = defaultSpeedX*2;
+				height_y = 35;
 				}
-			Matrix matrix = new Matrix();
-			Matrix matrix2 = new Matrix();
-					
-			gravityY = sensorY;
-			gravityX = sensorX*-1;
+
+			//gravityY = sensorY*2;
+			//gravityX = sensorX*-1*2;
 			
-			height_y = height_y + defaultSpeedY*elapsedTime + gravityY*elapsedTime*elapsedTime/2;
-			wide_x = wide_x + defaultSpeedX*elapsedTime + gravityX*elapsedTime*elapsedTime/2;
+			if(sensorX < 0){
+				gravityX = 1;
+			}else{
+				gravityX = -1;
+			}
+			if(sensorY < 0){
+				gravityY = -1;
+			}else{
+				gravityY = 1;
+			}
+			
+			height_y = (float) (height_y + defaultSpeedY*elapsedTime + gravityY*elapsedTime*elapsedTime);
+			wide_x = (float) (wide_x + defaultSpeedX*elapsedTime + gravityX*elapsedTime*elapsedTime);
 
 			defaultSpeedY = defaultSpeedY + gravityY*elapsedTime;
 			defaultSpeedX = defaultSpeedX + gravityX*elapsedTime;
 			
-			//float abs_scale = (float) Math.round(sensorZ/2);
-			float abs_scale = (float) sensorZ/4;
-				/*if(abs_scale < 0){
-					  abs_scale = (float) Math.abs(abs_scale);
-				}else{
-					  abs_scale = 1;
-				}*/
-			abs_scale = (float) Math.abs(abs_scale);
-			if(abs_scale < 1){
-				  abs_scale = (float) (1);
+			if(defaultSpeedY > 100){
+				defaultSpeedY = 0;
 			}
-
-			abs_scale = (float) (1);
-			
-			matrix.setScale(abs_scale,abs_scale);
-			matrix.postTranslate(wide_x,height_y);
-			//matrix2.setTranslate(wide_x,height_y);
-			
-    		Log.i("snow", "height_y=======" + height_y );
-    		Log.i("snow", "wide_x=======" + wide_x );
-    		Log.i("snow", "abs_scale=======" + abs_scale );
-    		Log.i("snow", "nowWidth=======" + nowWidth );
-    		Log.i("snow", "nowHeight=======" + nowHeight );
-			
-			canvas.drawBitmap(snow , matrix, new Paint());
-			//canvas.drawBitmap(snow , matrix2, new Paint());
-			
+			if(defaultSpeedX > 100){
+				defaultSpeedX = 0;
+			}
+			if(defaultSpeedY < -100){
+				defaultSpeedY = 0;
+			}
+			if(defaultSpeedX < -100){
+				defaultSpeedX = 0;
+			}
+			defaultSpeedY = defaultSpeedY + gravityY*elapsedTime;
+			defaultSpeedX = defaultSpeedX + gravityX*elapsedTime;
+									
+    		Log.i("defaultSpeed", "defaultSpeedY=======" + defaultSpeedY );
+    		Log.i("defaultSpeed", "defaultSpeedX=======" + defaultSpeedX );
+						
 			long pass_time = now_time - old_time;
 
 			old_time = now_time;
 	}
+	public void drowSakura(Canvas canvas, Bitmap snow, float wide_x2, float height_y2) {
+		// TODO Auto-generated method stub
+		Matrix matrix = new Matrix();
+		
+		matrix.setTranslate(wide_x2,height_y2);
+		canvas.drawBitmap(snow , matrix, new Paint());
+		
+	}
+
 }
 
