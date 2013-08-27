@@ -1,6 +1,7 @@
 /*開発用マスターブランチ
  * 20130717 背景描画色クラス分け
  * 20130808 衝突判定 球を二つ出して重ならない
+ * 20130827 衝突判定2 球を二つ出して重ならない
  * */
 
 package mobi.tomo.wallpaper01;
@@ -79,6 +80,7 @@ public class MainWallpaparService extends WallpaperService{
 		LiveWallpaperEngine() {
 			snow = BitmapFactory.decodeResource(getResources() , R.drawable.snow);
 			itemTouch  = BitmapFactory.decodeResource(getResources(), R.drawable.star);
+			 			
 			starObj.init();
 			for(int ii = 0;ii<sakura.length;ii++){
 				//SakuraGravityクラスの複製
@@ -229,30 +231,54 @@ public class MainWallpaparService extends WallpaperService{
 			float sakuraHeight_y = sakura[0].height_y - sakura[1].height_y;
 			float sakuraWide_x = sakura[0].wide_x - sakura[1].wide_x;
 			
-			sakuraWide_x = Math.abs(sakuraWide_x);
-			sakuraHeight_y = Math.abs(sakuraHeight_y);
+			//更新前の座標
+			float pre_sakuraHeight_y0 = sakura[0].height_y;
+			float pre_sakuraWide_x0 = sakura[0].wide_x;
+			float pre_sakuraHeight_y1 = sakura[1].height_y;
+			float pre_sakuraWide_x1 = sakura[1].wide_x;
 
-			//桜の画角が30*30の場合
+			float sakuraWide_x_abs = Math.abs(sakuraWide_x);
+			float sakuraHeight_y_abs = Math.abs(sakuraHeight_y);
+
+			//座標の更新
+			sakura[0].run(canvas,snow, newWidth,newHeight,sensorX,sensorY,sensorZ);
+			sakura[1].run(canvas,snow, newWidth,newHeight,sensorX,sensorY,sensorZ);
+			
+			//ボールのサイズ
+			float snowSize = snow.getWidth();
+
 			//重なっているときのみ座標の更新
-			if(sakuraHeight_y < 30 && sakuraWide_x < 30){
-				sakura[0].height_y = sakura[0].height_y - sakuraHeight_y/2 - 1;
-				sakura[0].wide_x = sakura[0].wide_x - sakuraWide_x/2 - 1;
+			//[0]が[1]よりも左の場合はマイナス
+			if(sakuraHeight_y_abs < snowSize && sakuraWide_x_abs < snowSize){
+				sakuraHeight_y_abs = snowSize - sakuraHeight_y_abs;
+				//重なっている時は、座標を更新しない。
+				if(sakuraHeight_y < 0){
+					sakura[0].height_y = sakura[0].height_y - sakuraHeight_y_abs/2;
+					sakura[1].height_y = sakura[1].height_y + sakuraHeight_y_abs/2;
+				}else{
+					sakura[0].height_y = sakura[0].height_y + sakuraHeight_y_abs/2;
+					sakura[1].height_y = sakura[1].height_y - sakuraHeight_y_abs/2;
+				}
 				
-				sakura[1].height_y = sakura[1].height_y + sakuraHeight_y/2 + 1;
-				sakura[1].wide_x = sakura[1].wide_x + sakuraWide_x/2 + 1;
-			}else{
-				for(int iii = 0;iii<sakura.length;iii++){
-					//SakuraGravityクラスの複製：座標更新
-					sakura[iii].run(canvas,snow, newWidth,newHeight,sensorX,sensorY,sensorZ);
+				sakuraWide_x_abs = snowSize - sakuraWide_x_abs;
+				//重なっている時は、座標を更新しない。
+				if(sakuraWide_x < 0){
+					sakura[0].wide_x = sakura[0].wide_x - sakuraWide_x_abs/2;
+					sakura[1].wide_x = sakura[1].wide_x + sakuraWide_x_abs/2;
+				}else{
+					sakura[0].wide_x = sakura[0].wide_x + sakuraWide_x_abs/2;
+					sakura[1].wide_x = sakura[1].wide_x - sakuraWide_x_abs/2;
 				}
 			}
-			
+
 			starObj.run(canvas,itemTouch,mTouchX,mTouchY);
 
-			for(int iiii = 0;iiii<sakura.length;iiii++){
+			//for(int iiii = 0;iiii<sakura.length;iiii++){
 				//SakuraGravityクラスの複製:描画
-				sakura[iiii].drowSakura(canvas,snow,sakura[iiii].wide_x,sakura[iiii].height_y);
-			}
+				//sakura[iiii].drowSakura(canvas,snow,sakura[iiii].wide_x,sakura[iiii].height_y);
+			//}
+			sakura[0].drowSakura(canvas,snow,sakura[0].wide_x,sakura[0].height_y);
+			sakura[1].drowSakura(canvas,snow,sakura[1].wide_x,sakura[1].height_y);
 
 		}
 		

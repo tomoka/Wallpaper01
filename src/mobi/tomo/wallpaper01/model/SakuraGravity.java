@@ -136,16 +136,16 @@ public class SakuraGravity {
 
 			old_time = now_time;
 	}
-	public void drowSakura(Canvas canvas,Bitmap snow, float wide_x2, float height_y2) {
+	public void drowSakura(Canvas canvas, Bitmap snow, float wide_x2, float height_y2) {
 		// TODO Auto-generated method stub
-		
 		Matrix matrix = new Matrix();
-				
+		
 		//matrix.setScale(abs_scale,abs_scale);
 		//matrix.postTranslate(wide_x,height_y);
-		matrix.setTranslate(wide_x,height_y);
+		matrix.setTranslate(wide_x2,height_y2);
 		canvas.drawBitmap(snow , matrix, new Paint());
 		//canvas.drawBitmap(snow , matrix2, new Paint());
+		
 	}
 
 }
