@@ -267,8 +267,7 @@ public class MainWallpaparService extends WallpaperService{
 				sensorY = event.values[1];
 				sensorZ = event.values[2];
 			}
-
-	}
+		}
 
 	}
 }
