@@ -1,3 +1,4 @@
+/*20130903一定の速さで跳ね返り*/
 package mobi.tomo.wallpaper01.model;
 
 import java.util.Random;
